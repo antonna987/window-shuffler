@@ -58,13 +58,23 @@ def check_windowtype(window):
         pass
 
 
+def get_activities_bar_height():
+    xprop_data = get(["xprop", "-root", "_NET_WORKAREA"])
+    try:
+        vals = xprop_data.split("=")[1].strip().split(", ")
+        activities_bar_height = int(vals[1])
+        return activities_bar_height
+    except IndexError:
+        return 0
+
+
 def calc_playfield(win_geodata):
     wins = win_geodata["windows"]
     offset = win_geodata["offset"]
     wa = win_geodata["wa"]
     return [
         [offset[0] + wa[0], offset[1] + wa[1]],
-        [wa[2], wa[3]],
+        [wa[2], wa[3] - get_activities_bar_height()],
     ]
 
 
@@ -85,7 +95,7 @@ def get_yshift(window):
         y_shift = - int(check[2])
     except IndexError:
         y_shift = 0
-    return y_shift
+    return y_shift + get_activities_bar_height()
 
 
 def get_window(win_title):
